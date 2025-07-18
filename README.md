@@ -30,7 +30,13 @@ A real-time log viewer for JSON event logs with image support and event type col
    npm run start
    ```
 
-4. Open your browser to `http://localhost:5173`
+4. You need to symlink in all-run-log.json from your impostor app repo to impostor-log-viewer. something like:
+
+`ln -s <path to EXTREMELY-EPIC-BUILD/>/mood_snapshots/all-run-log.json ..<path to log viewer>/webapp/all-run-log.json`
+
+Logs should automatically update.
+
+5. Open your browser to `http://localhost:5173`
 
 ## Usage
 
@@ -105,12 +111,6 @@ Checks the last modified time of a log file for real-time monitoring.
 #### GET `/api/image`
 
 Serves image files associated with log entries.
-
-You need to symlink in all-run-log.json from your impostor app repo to impostor-log-viewer. something like:
-
-`ln -s <path to EXTREMELY-EPIC-BUILD/>/mood_snapshots/all-run-log.json ..<path to log viewer>/webapp/all-run-log.json`
-
-Logs should automatically update.
 
 **Query Parameters:**
 

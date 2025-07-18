@@ -32,7 +32,7 @@ A real-time log viewer for JSON event logs with image support and event type col
 
 4. You need to symlink in all-run-log.json from your impostor app repo to impostor-log-viewer. something like:
 
-`ln -s <path to EXTREMELY-EPIC-BUILD/>/mood_snapshots/all-run-log.json ..<path to log viewer>/webapp/all-run-log.json`
+`ln -s <path to EXTREMELY-EPIC-BUILD/>/mood_snapshots/all-run-log.json ..<path to log viewer>/webapp/log_samples/all-run-log.json`
 
 Logs should automatically update.
 

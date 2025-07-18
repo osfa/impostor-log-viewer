@@ -106,6 +106,12 @@ Checks the last modified time of a log file for real-time monitoring.
 
 Serves image files associated with log entries.
 
+You need to symlink in all-run-log.json from your impostor app repo to impostor-log-viewer. something like:
+
+`ln -s <path to EXTREMELY-EPIC-BUILD/>/mood_snapshots/all-run-log.json ..<path to log viewer>/webapp/all-run-log.json`
+
+Logs should automatically update.
+
 **Query Parameters:**
 
 - `path` (required): Path to the image file

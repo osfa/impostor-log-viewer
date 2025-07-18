@@ -16,4 +16,7 @@ export interface LogEntry {
   api_endpoint?: string;
   caption?: string;
   mood?: number;
+  note?: string;
+  changes?: string[];
+  evaluation?: string;
 }

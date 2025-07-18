@@ -13,16 +13,19 @@ A real-time log viewer for JSON event logs with image support and event type col
 ## Getting Started
 
 1. Navigate to the webapp directory:
+
    ```bash
    cd webapp
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Start both the API server and Vite dev server:
+
    ```bash
    npm run start
    ```
@@ -31,7 +34,7 @@ A real-time log viewer for JSON event logs with image support and event type col
 
 ## Usage
 
-- The default log file is set to `../log_samples/d9da5efe-event-log.json`
+- The default log file is set to `../log_samples/all-run-log.json`
 - You can change the log file path in the input field at the top
 - The app will automatically refresh when the log file changes
 - Click "Refresh" to manually reload the logs
@@ -47,18 +50,22 @@ A real-time log viewer for JSON event logs with image support and event type col
 ## API Documentation
 
 The application runs two servers:
+
 - **Frontend (Vite)**: `http://localhost:5173`
 - **Backend (Express)**: `http://localhost:3001`
 
 ### API Endpoints
 
 #### GET `/api/logs`
+
 Retrieves log entries from a specified JSON file.
 
 **Query Parameters:**
-- `file` (required): Path to the log file (e.g., `../log_samples/d9da5efe-event-log.json`)
+
+- `file` (required): Path to the log file (e.g., `../log_samples/all-run-log.json`)
 
 **Response:**
+
 ```json
 {
   "logs": [
@@ -80,12 +87,15 @@ Retrieves log entries from a specified JSON file.
 ```
 
 #### GET `/api/logs/status`
+
 Checks the last modified time of a log file for real-time monitoring.
 
 **Query Parameters:**
+
 - `file` (required): Path to the log file
 
 **Response:**
+
 ```json
 {
   "lastModified": 1752836907000
@@ -93,9 +103,11 @@ Checks the last modified time of a log file for real-time monitoring.
 ```
 
 #### GET `/api/image`
+
 Serves image files associated with log entries.
 
 **Query Parameters:**
+
 - `path` (required): Path to the image file
 
 **Response:** Returns the image file or 404 if not found.

@@ -79,12 +79,21 @@ app.get('/api/image', (req, res) => {
   }
   
   try {
-    // Convert absolute path to relative for security
-    const relativePath = imagePath.replace(/^\/.*?log_samples/, '../log_samples');
-    const fullPath = path.resolve(__dirname, relativePath);
+    let fullPath;
     
-    // Security check
-    if (!fullPath.includes('log_samples')) {
+    // Handle absolute paths (like /Users/jbe/Dropbox/_outputs/impostor_event_log/...)
+    if (path.isAbsolute(imagePath)) {
+      fullPath = imagePath;
+    } else {
+      // Handle relative paths within log_samples
+      const relativePath = imagePath.replace(/^\/.*?log_samples/, '../log_samples');
+      fullPath = path.resolve(__dirname, relativePath);
+    }
+    
+    // Security check - allow images from impostor_event_log or log_samples
+    const isAllowed = fullPath.includes('impostor_event_log') || fullPath.includes('log_samples');
+    
+    if (!isAllowed) {
       return res.status(403).json({ error: 'Access denied' });
     }
     

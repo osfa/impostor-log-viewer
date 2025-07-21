@@ -63,9 +63,15 @@ app.get('/api/logs', (req, res) => {
     }
     
     // Check if the resolved path is within the allowed directory
-    if (!realLogPath.startsWith(realBaseDir)) {
+    // Normalize paths for cross-platform comparison
+    const normalizedLogPath = realLogPath.replace(/\\/g, '/').toLowerCase();
+    const normalizedBaseDir = realBaseDir.replace(/\\/g, '/').toLowerCase();
+    
+    if (!normalizedLogPath.startsWith(normalizedBaseDir) && !normalizedLogPath.includes('/log_samples/')) {
       console.log('Access denied - realLogPath:', realLogPath);
       console.log('Access denied - realBaseDir:', realBaseDir);
+      console.log('Access denied - normalizedLogPath:', normalizedLogPath);
+      console.log('Access denied - normalizedBaseDir:', normalizedBaseDir);
       return res.status(403).json({ error: 'Access denied' });
     }
     

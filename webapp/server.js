@@ -49,11 +49,23 @@ app.get('/api/logs', (req, res) => {
     console.log('Resolved logPath:', logPath);
     
     // Security check - ensure file is within allowed directory
-    const normalizedLogPath = path.normalize(logPath);
-    const baseDir = path.resolve(__dirname, '../log_samples');
-    const normalizedBaseDir = path.normalize(baseDir);
+    // Handle symlinks by resolving the real path
+    let realLogPath, realBaseDir;
+    try {
+      realLogPath = fs.realpathSync(logPath);
+      const baseDir = path.resolve(__dirname, '../log_samples');
+      realBaseDir = fs.realpathSync(baseDir);
+    } catch (err) {
+      // If realpath fails, fall back to normalized paths
+      realLogPath = path.normalize(logPath);
+      const baseDir = path.resolve(__dirname, '../log_samples');
+      realBaseDir = path.normalize(baseDir);
+    }
     
-    if (!normalizedLogPath.startsWith(normalizedBaseDir)) {
+    // Check if the resolved path is within the allowed directory
+    if (!realLogPath.startsWith(realBaseDir)) {
+      console.log('Access denied - realLogPath:', realLogPath);
+      console.log('Access denied - realBaseDir:', realBaseDir);
       return res.status(403).json({ error: 'Access denied' });
     }
     

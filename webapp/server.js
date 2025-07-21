@@ -9,6 +9,25 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3001;
 
+// Helper function to normalize paths in JSON data for cross-platform compatibility
+const normalizePaths = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(normalizePaths);
+  } else if (obj && typeof obj === 'object') {
+    const normalized = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (typeof value === 'string' && key.includes('path')) {
+        // Normalize path-like strings to use forward slashes
+        normalized[key] = value.replace(/\\/g, '/');
+      } else {
+        normalized[key] = normalizePaths(value);
+      }
+    }
+    return normalized;
+  }
+  return obj;
+};
+
 // Enable CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -38,10 +57,29 @@ app.get('/api/logs', (req, res) => {
     
     const stats = fs.statSync(logPath);
     const data = fs.readFileSync(logPath, 'utf8');
-    const logs = JSON.parse(data);
+    
+    // Clean up potential Windows path issues in JSON
+    const cleanedData = data
+      .replace(/\\\\/g, '/') // Convert double backslashes to forward slashes
+      .replace(/\\(?!["\\/bfnrt])/g, '/'); // Convert single backslashes to forward slashes (except JSON escape sequences)
+    
+    let logs;
+    try {
+      logs = JSON.parse(cleanedData);
+    } catch (parseError) {
+      // If parsing fails, try with the original data
+      try {
+        logs = JSON.parse(data);
+      } catch (originalError) {
+        throw new Error(`JSON parsing failed: ${originalError.message}`);
+      }
+    }
+    
+    // Normalize paths in the parsed data for cross-platform compatibility
+    const normalizedLogs = normalizePaths(logs);
     
     res.json({
-      logs: logs.reverse(), // Show newest first
+      logs: normalizedLogs.reverse(), // Show newest first
       lastModified: stats.mtime.getTime()
     });
   } catch (error) {

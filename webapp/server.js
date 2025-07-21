@@ -45,6 +45,8 @@ app.get('/api/logs', (req, res) => {
   
   try {
     const logPath = path.resolve(__dirname, file);
+    console.log('Requested file:', file);
+    console.log('Resolved logPath:', logPath);
     
     // Security check - ensure file is within allowed directory
     const normalizedLogPath = path.normalize(logPath);
@@ -55,8 +57,15 @@ app.get('/api/logs', (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
     
+    // Check if file exists
+    if (!fs.existsSync(logPath)) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
     const stats = fs.statSync(logPath);
     const data = fs.readFileSync(logPath, 'utf8');
+    console.log('File data length:', data.length);
+    console.log('File data preview:', data.substring(0, 100));
     
     // Clean up potential Windows path issues in JSON
     const cleanedData = data
@@ -67,11 +76,14 @@ app.get('/api/logs', (req, res) => {
     try {
       logs = JSON.parse(cleanedData);
     } catch (parseError) {
+      console.log('Parse error with cleaned data:', parseError.message);
       // If parsing fails, try with the original data
       try {
         logs = JSON.parse(data);
       } catch (originalError) {
-        throw new Error(`JSON parsing failed: ${originalError.message}`);
+        console.log('Parse error with original data:', originalError.message);
+        console.log('Attempting to parse:', data.substring(0, 200));
+        throw new Error(`JSON parsing failed: ${originalError.message}. Data preview: ${data.substring(0, 100)}`);
       }
     }
     

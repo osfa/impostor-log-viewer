@@ -62,18 +62,19 @@ app.get('/api/logs', (req, res) => {
       realBaseDir = path.normalize(baseDir);
     }
     
-    // Check if the resolved path is within the allowed directory
-    // Normalize paths for cross-platform comparison
-    const normalizedLogPath = realLogPath.replace(/\\/g, '/').toLowerCase();
+    // Security check - allow files within log_samples or their symlink targets
+    // The original request path must start within log_samples
+    const originalPath = path.normalize(logPath).replace(/\\/g, '/').toLowerCase();
     const normalizedBaseDir = realBaseDir.replace(/\\/g, '/').toLowerCase();
     
-    if (!normalizedLogPath.startsWith(normalizedBaseDir) && !normalizedLogPath.includes('/log_samples/')) {
-      console.log('Access denied - realLogPath:', realLogPath);
-      console.log('Access denied - realBaseDir:', realBaseDir);
-      console.log('Access denied - normalizedLogPath:', normalizedLogPath);
-      console.log('Access denied - normalizedBaseDir:', normalizedBaseDir);
+    if (!originalPath.startsWith(normalizedBaseDir)) {
+      console.log('Access denied - original path not in log_samples');
+      console.log('originalPath:', originalPath);
+      console.log('normalizedBaseDir:', normalizedBaseDir);
       return res.status(403).json({ error: 'Access denied' });
     }
+    
+    console.log('Access granted - symlink target:', realLogPath);
     
     // Check if file exists
     if (!fs.existsSync(logPath)) {

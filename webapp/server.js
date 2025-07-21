@@ -45,8 +45,6 @@ app.get('/api/logs', (req, res) => {
   
   try {
     const logPath = path.resolve(__dirname, file);
-    console.log('Requested file:', file);
-    console.log('Resolved logPath:', logPath);
     
     // Security check - ensure file is within allowed directory
     // Handle symlinks by resolving the real path
@@ -68,13 +66,9 @@ app.get('/api/logs', (req, res) => {
     const normalizedBaseDir = realBaseDir.replace(/\\/g, '/').toLowerCase();
     
     if (!originalPath.startsWith(normalizedBaseDir)) {
-      console.log('Access denied - original path not in log_samples');
-      console.log('originalPath:', originalPath);
-      console.log('normalizedBaseDir:', normalizedBaseDir);
-      return res.status(403).json({ error: 'Access denied' });
+        return res.status(403).json({ error: 'Access denied' });
     }
     
-    console.log('Access granted - symlink target:', realLogPath);
     
     // Check if file exists
     if (!fs.existsSync(logPath)) {
@@ -83,8 +77,6 @@ app.get('/api/logs', (req, res) => {
     
     const stats = fs.statSync(logPath);
     const data = fs.readFileSync(logPath, 'utf8');
-    console.log('File data length:', data.length);
-    console.log('File data preview:', data.substring(0, 100));
     
     // Clean up potential Windows path issues in JSON
     const cleanedData = data
@@ -95,13 +87,10 @@ app.get('/api/logs', (req, res) => {
     try {
       logs = JSON.parse(cleanedData);
     } catch (parseError) {
-      console.log('Parse error with cleaned data:', parseError.message);
       // If parsing fails, try with the original data
       try {
         logs = JSON.parse(data);
       } catch (originalError) {
-        console.log('Parse error with original data:', originalError.message);
-        console.log('Attempting to parse:', data.substring(0, 200));
         throw new Error(`JSON parsing failed: ${originalError.message}. Data preview: ${data.substring(0, 100)}`);
       }
     }
@@ -169,7 +158,6 @@ app.get('/api/image', (req, res) => {
     
     // Security check - allow images from impostor_event_log, log_samples, or mood_snapshots
     const normalizedFullPath = path.normalize(fullPath).replace(/\\/g, '/').toLowerCase();
-    console.log('Image request - normalizedFullPath:', normalizedFullPath);
     
     const isAllowed = normalizedFullPath.includes('impostor_event_log') || 
                      normalizedFullPath.includes('log_samples') ||
@@ -177,11 +165,9 @@ app.get('/api/image', (req, res) => {
                      normalizedFullPath.includes('love_yourself_refactor');
     
     if (!isAllowed) {
-      console.log('Image access denied:', normalizedFullPath);
       return res.status(403).json({ error: 'Access denied' });
     }
     
-    console.log('Image access granted:', normalizedFullPath);
     
     if (fs.existsSync(fullPath)) {
       res.sendFile(fullPath);

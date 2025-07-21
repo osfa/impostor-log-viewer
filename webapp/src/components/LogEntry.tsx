@@ -192,9 +192,7 @@ const LogEntry: React.FC<LogEntryProps> = ({ entry }) => {
       {entry.image_path && entry.image_path !== null && (
         <div className="ml-4 flex-shrink-0">
           <img
-            src={`/api/image?path=${encodeURIComponent(
-              entry.image_path.replace("/home/jbe", "/Users/jbe")
-            )}`}
+            src={`/api/image?path=${encodeURIComponent(entry.image_path)}`}
             alt="Log entry image"
             className="w-32 h-24 object-cover rounded border"
             onError={(e) => {

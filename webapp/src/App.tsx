@@ -3,7 +3,7 @@ import { useLogWatcher } from "./hooks/useLogWatcher";
 import LogEntry from "./components/LogEntry";
 
 function App() {
-  const [logFile, setLogFile] = useState("../log_samples//all-run-log.json");
+  const [logFile, setLogFile] = useState("../log_samples/all-run-log.json");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const { logs, error, refetch } = useLogWatcher(logFile);
 

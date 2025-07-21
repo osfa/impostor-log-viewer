@@ -28,7 +28,11 @@ app.get('/api/logs', (req, res) => {
     const logPath = path.resolve(__dirname, file);
     
     // Security check - ensure file is within allowed directory
-    if (!logPath.includes('log_samples')) {
+    const normalizedLogPath = path.normalize(logPath);
+    const baseDir = path.resolve(__dirname, '../log_samples');
+    const normalizedBaseDir = path.normalize(baseDir);
+    
+    if (!normalizedLogPath.startsWith(normalizedBaseDir)) {
       return res.status(403).json({ error: 'Access denied' });
     }
     
@@ -56,7 +60,11 @@ app.get('/api/logs/status', (req, res) => {
   try {
     const logPath = path.resolve(__dirname, file);
     
-    if (!logPath.includes('log_samples')) {
+    const normalizedLogPath = path.normalize(logPath);
+    const baseDir = path.resolve(__dirname, '../log_samples');
+    const normalizedBaseDir = path.normalize(baseDir);
+    
+    if (!normalizedLogPath.startsWith(normalizedBaseDir)) {
       return res.status(403).json({ error: 'Access denied' });
     }
     
@@ -86,12 +94,17 @@ app.get('/api/image', (req, res) => {
       fullPath = imagePath;
     } else {
       // Handle relative paths within log_samples
-      const relativePath = imagePath.replace(/^\/.*?log_samples/, '../log_samples');
+      const relativePath = imagePath.replace(/^.*[/\\]log_samples/, '../log_samples');
       fullPath = path.resolve(__dirname, relativePath);
     }
     
     // Security check - allow images from impostor_event_log or log_samples
-    const isAllowed = fullPath.includes('impostor_event_log') || fullPath.includes('log_samples');
+    const normalizedFullPath = path.normalize(fullPath);
+    const logSamplesDir = path.resolve(__dirname, '../log_samples');
+    const normalizedLogSamplesDir = path.normalize(logSamplesDir);
+    
+    const isAllowed = normalizedFullPath.includes('impostor_event_log') || 
+                     normalizedFullPath.startsWith(normalizedLogSamplesDir);
     
     if (!isAllowed) {
       return res.status(403).json({ error: 'Access denied' });

@@ -167,17 +167,21 @@ app.get('/api/image', (req, res) => {
       fullPath = path.resolve(__dirname, relativePath);
     }
     
-    // Security check - allow images from impostor_event_log or log_samples
-    const normalizedFullPath = path.normalize(fullPath);
-    const logSamplesDir = path.resolve(__dirname, '../log_samples');
-    const normalizedLogSamplesDir = path.normalize(logSamplesDir);
+    // Security check - allow images from impostor_event_log, log_samples, or mood_snapshots
+    const normalizedFullPath = path.normalize(fullPath).replace(/\\/g, '/').toLowerCase();
+    console.log('Image request - normalizedFullPath:', normalizedFullPath);
     
     const isAllowed = normalizedFullPath.includes('impostor_event_log') || 
-                     normalizedFullPath.startsWith(normalizedLogSamplesDir);
+                     normalizedFullPath.includes('log_samples') ||
+                     normalizedFullPath.includes('mood_snapshots') ||
+                     normalizedFullPath.includes('love_yourself_refactor');
     
     if (!isAllowed) {
+      console.log('Image access denied:', normalizedFullPath);
       return res.status(403).json({ error: 'Access denied' });
     }
+    
+    console.log('Image access granted:', normalizedFullPath);
     
     if (fs.existsSync(fullPath)) {
       res.sendFile(fullPath);

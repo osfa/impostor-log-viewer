@@ -19,4 +19,18 @@ export interface LogEntry {
   note?: string;
   changes?: string[];
   evaluation?: string;
+  // New fields from updated log format
+  elapsed_time?: string;
+  reflection?: string;
+  decision?: string;
+  reason?: string;
+  novelty?: number;
+  boredom?: number;
+  drawing_prompt?: string;
+  message?: string;
+  ready_to_draw?: boolean;
+  cooldown_remaining?: number;
+  start_time?: number;
+  start_time_iso?: string;
+  config?: Record<string, unknown>;
 }

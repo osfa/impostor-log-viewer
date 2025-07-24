@@ -10,6 +10,7 @@ const getEventTypeColor = (type: string) => {
     case "ollama_api_call":
       return "bg-blue-50 border-blue-200 text-blue-800";
     case "mood":
+    case "mood_update":
       return "bg-purple-50 border-purple-200 text-purple-800";
     case "error":
       return "bg-red-50 border-red-200 text-red-800";
@@ -26,6 +27,18 @@ const getEventTypeColor = (type: string) => {
       return "bg-orange-50 border-orange-200 text-orange-800";
     case "drawing_prompt":
       return "bg-indigo-50 border-indigo-200 text-indigo-800";
+    case "reflection":
+      return "bg-teal-50 border-teal-200 text-teal-800";
+    case "decision":
+      return "bg-emerald-50 border-emerald-200 text-emerald-800";
+    case "caption":
+      return "bg-cyan-50 border-cyan-200 text-cyan-800";
+    case "info":
+      return "bg-sky-50 border-sky-200 text-sky-800";
+    case "session_start":
+      return "bg-violet-50 border-violet-200 text-violet-800";
+    case "run_metadata":
+      return "bg-slate-50 border-slate-200 text-slate-800";
     default:
       return "bg-gray-50 border-gray-200 text-gray-800";
   }
@@ -40,6 +53,8 @@ const LogEntry: React.FC<LogEntryProps> = ({ entry }) => {
   const [expandedResponse, setExpandedResponse] = useState(false);
   const [expandedNote, setExpandedNote] = useState(false);
   const [expandedEvaluation, setExpandedEvaluation] = useState(false);
+  const [expandedReflection, setExpandedReflection] = useState(false);
+  const [expandedDrawingPrompt, setExpandedDrawingPrompt] = useState(false);
   
   const colorClass = getEventTypeColor(entry.type);
 
@@ -137,6 +152,86 @@ const LogEntry: React.FC<LogEntryProps> = ({ entry }) => {
           </div>
         )}
 
+        {/* Enhanced display for reflection entries */}
+        {entry.reflection && (
+          <div className="mb-1">
+            <div className="bg-white/40 p-1.5 rounded">
+              <span className="text-xs font-medium text-gray-700">🤔 Reflection:</span>
+              <div className="mt-1">
+                {renderContent(entry.reflection, expandedReflection, setExpandedReflection)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Enhanced display for decision entries */}
+        {entry.decision && (
+          <div className="mb-1">
+            <div className="bg-white/40 p-1.5 rounded">
+              <span className="text-xs font-medium text-gray-700">⚡ Decision:</span>
+              <div className="mt-1 text-xs">
+                <div className="mb-1">
+                  <span className="font-medium">Decision:</span> {entry.decision}
+                </div>
+                {entry.reason && (
+                  <div className="mb-1">
+                    <span className="font-medium">Reason:</span> {entry.reason}
+                  </div>
+                )}
+                {entry.novelty !== undefined && (
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="font-medium">Novelty:</span>
+                    <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                      <div
+                        className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                        style={{ width: `${entry.novelty * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs">{(entry.novelty * 100).toFixed(0)}%</span>
+                  </div>
+                )}
+                {entry.boredom !== undefined && (
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="font-medium">Boredom:</span>
+                    <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                      <div
+                        className="bg-yellow-500 h-1.5 rounded-full transition-all duration-300"
+                        style={{ width: `${entry.boredom * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs">{(entry.boredom * 100).toFixed(0)}%</span>
+                  </div>
+                )}
+                {entry.drawing_prompt && (
+                  <div className="mt-2">
+                    <span className="text-xs font-medium text-gray-700">🎨 Drawing Prompt:</span>
+                    <div className="mt-1">
+                      {renderContent(entry.drawing_prompt, expandedDrawingPrompt, setExpandedDrawingPrompt)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Enhanced display for comfy_prompt entries */}
+        {entry.type === 'comfy_prompt' && entry.drawing_prompt && (
+          <div className="mb-1">
+            <div className="bg-white/40 p-1.5 rounded">
+              <span className="text-xs font-medium text-gray-700">🎨 Drawing Prompt:</span>
+              <div className="mt-1">
+                {renderContent(entry.drawing_prompt, expandedDrawingPrompt, setExpandedDrawingPrompt)}
+              </div>
+              {entry.message && (
+                <div className="mt-2 text-xs">
+                  <span className="font-medium">Message:</span> {entry.message}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {(entry.mood !== undefined || entry.caption) && (
           <div className="mb-1">
             <div className="bg-white/40 p-1.5 rounded">
@@ -177,6 +272,7 @@ const LogEntry: React.FC<LogEntryProps> = ({ entry }) => {
 
         <div className="flex gap-3 text-xs text-gray-500 mt-1">
           {entry.model && <span>🤖 {entry.model}</span>}
+          {entry.elapsed_time && <span>⏱️ {entry.elapsed_time}</span>}
           {entry.success !== undefined && (
             <span className={entry.success ? "text-green-600" : "text-red-600"}>
               {entry.success ? "✅" : "❌"}
